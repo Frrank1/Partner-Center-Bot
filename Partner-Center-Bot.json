@@ -1,0 +1,85 @@
+{
+  "luis_schema_version": "1.3.1",
+  "versionId": "0.1",
+  "name": "Partner-Center-Bot",
+  "desc": "",
+  "culture": "en-us",
+  "intents": [
+    {
+      "name": "ListCustomers"
+    },
+    {
+      "name": "ListSubscriptions"
+    },
+    {
+      "name": "None"
+    },
+    {
+      "name": "SelectCustomer"
+    },
+    {
+      "name": "SelectSubscription"
+    }
+  ],
+  "entities": [
+    {
+      "name": "customer"
+    },
+    {
+      "name": "subscription"
+    }
+  ],
+  "composites": [],
+  "closedLists": [],
+  "bing_entities": [],
+  "actions": [],
+  "model_features": [
+    {
+      "name": "ListShow",
+      "mode": true,
+      "words": "list,show",
+      "activated": true
+    }
+  ],
+  "regex_features": [
+    {
+      "name": "identifier",
+      "pattern": "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+      "activated": true
+    }
+  ],
+  "utterances": [
+    {
+      "text": "list customers",
+      "intent": "ListCustomers",
+      "entities": []
+    },
+    {
+      "text": "list subscriptions",
+      "intent": "ListSubscriptions",
+      "entities": []
+    },
+    {
+      "text": "select customer 4b43b8b0-2cab-45f7-91c3-9e9a3a8a6f0a",
+      "intent": "SelectCustomer",
+      "entities": [
+        {
+          "entity": "customer",
+          "startPos": 2,
+          "endPos": 10
+        }
+      ]
+    },
+    {
+      "text": "select subscription 5dfb26b6-4fee-4186-b44d-f2b374d90dca",
+      "intent": "SelectSubscription",
+      "entities": [
+        {
+          "entity": "subscription",
+          "startPos": 2,
+          "endPos": 10
+        }
+      ]
+    }
+  ]
+}
