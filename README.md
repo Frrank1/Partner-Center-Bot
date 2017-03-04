@@ -4,7 +4,7 @@ features are supported. Additional abilities will be added over time. The intent
 technology can be utilize to support customers. Most customers want the ability to resolve issues on their own, and this sample provides you a tool that can help fufill that
 desire.
 
-__Current Build Status:__ ![Build Status](https://ustechsales.visualstudio.com/_apis/public/build/definitions/15dd995f-72f1-415c-ae52-f4c3d46fd161/5/badge)
+__Current Build Status:__ ![Build Status](https://ustechsales.visualstudio.com/_apis/public/build/definitions/15dd995f-72f1-415c-ae52-f4c3d46fd161/8/badge)
 
 ### Prerequisites 
 The following are _optional_ prerequisites for this sample project 
