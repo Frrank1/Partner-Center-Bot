@@ -15,6 +15,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
     using Microsoft.Bot.Builder.Luis.Models;
     using Microsoft.Bot.Connector;
     using PartnerCenter.Models.Customers;
+    using RequestContext;
     using Security;
 
     /// <summary>
@@ -42,64 +43,72 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// Performs the operation represented by this intent.
         /// </summary>
         /// <param name="context">The context of the conversational process.</param>
-        /// <param name="result">The message in the conversation.</param>
+        /// <param name="message">The message from the authenticated user.</param>
+        /// <param name="result">The result from Language Understanding cognitive service.</param>
         /// <param name="service">Provides access to core services.</param>
-        /// <returns>
-        /// An instance of <see cref="Task" /> that represents the asynchronous operation.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
+        /// <returns>An instance of <see cref="Task"/> that represents the asynchronous operation.</returns>
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="context"/> is null.
+        /// or
+        /// <paramref name="message"/> is null.
         /// or
         /// <paramref name="result"/> is null.
         /// or 
         /// <paramref name="service"/> is null.
         /// </exception>
-        public async Task ExecuteAsync(IDialogContext context, LuisResult result, IBotService service)
+        public async Task ExecuteAsync(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result, IBotService service)
         {
             CustomerPrincipal principal;
             Customer customer;
             DateTime startTime;
             Dictionary<string, double> eventMeasurements;
             Dictionary<string, string> eventProperties;
-            EntityRecommendation customerEntity;
-            IMessageActivity message;
+            EntityRecommendation indentifierEntity;
+            Guid correlationId;
+            IMessageActivity response;
+            IPartner operations;
             string customerId = string.Empty;
 
             context.AssertNotNull(nameof(context));
+            message.AssertNotNull(nameof(message));
             result.AssertNotNull(nameof(result));
             service.AssertNotNull(nameof(service));
 
             try
             {
                 startTime = DateTime.Now;
+                correlationId = Guid.NewGuid();
+                response = context.MakeMessage();
 
-                message = context.MakeMessage();
+                operations = service.PartnerCenter.With(RequestContextFactory.Instance.Create(correlationId));
+
                 principal = await context.GetCustomerPrincipalAsync(service);
 
-                if (result.TryFindEntity("customer", out customerEntity))
+                if (result.TryFindEntity("identifier", out indentifierEntity))
                 {
-                    customerId = customerEntity.Entity.Replace(" ", string.Empty);
+                    customerId = indentifierEntity.Entity.Replace(" ", string.Empty);
                     principal.Operation.CustomerId = customerId;
                     context.StoreCustomerPrincipal(principal);
                 }
 
                 if (string.IsNullOrEmpty(customerId))
                 {
-                    message.Text = Resources.UnableToLocateCustomer;
+                    response.Text = Resources.UnableToLocateCustomer;
                 }
                 else
                 {
-                    customer = await service.PartnerCenter.Customers.ById(customerId).GetAsync();
-                    message.Text = $"Customer context is now configured for {customer.CompanyProfile.CompanyName}";
+                    customer = await operations.Customers.ById(customerId).GetAsync();
+                    response.Text = $"Customer context is now configured for {customer.CompanyProfile.CompanyName}";
                 }
 
-                await context.PostAsync(message);
+                await context.PostAsync(response);
 
                 // Capture the request for the customer summary for analysis.
                 eventProperties = new Dictionary<string, string>
                 {
                     { "ChannelId", context.Activity.ChannelId },
                     { "CustomerId", customerId },
+                    { "PartnerCenterCorrelationId", correlationId.ToString() },
                     { "PrincipalCustomerId", principal.CustomerId },
                     { "LocalTimeStamp", context.Activity.LocalTimestamp.ToString() },
                     { "UserId", principal.ObjectId }
@@ -116,10 +125,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
             finally
             {
                 customer = null;
-                customerEntity = null;
+                indentifierEntity = null;
                 eventMeasurements = null;
                 eventProperties = null;
                 message = null;
+                operations = null;
             }
         }
     }

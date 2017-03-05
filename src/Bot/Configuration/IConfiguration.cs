@@ -82,6 +82,16 @@ namespace Microsoft.Store.PartnerCenter.Bot.Configuration
         string PartnerCenterApplicationTenantId { get; }
 
         /// <summary>
+        /// Gets the question and answer knowledgebase identifier.
+        /// </summary>
+        string QnAKnowledgebaseId { get; }
+
+        /// <summary>
+        /// Gets question and answer subscription subscription key.
+        /// </summary>
+        string QnASubscriptionKey { get; }
+
+        /// <summary>
         /// Gets the Redis Cache connection string.
         /// </summary>
         string RedisCacheConnectionString { get; }

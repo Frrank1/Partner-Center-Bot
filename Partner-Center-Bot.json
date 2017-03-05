@@ -15,6 +15,9 @@
       "name": "None"
     },
     {
+      "name": "Question"
+    },
+    {
       "name": "SelectCustomer"
     },
     {
@@ -23,10 +26,7 @@
   ],
   "entities": [
     {
-      "name": "customer"
-    },
-    {
-      "name": "subscription"
+      "name": "identifier"
     }
   ],
   "composites": [],
@@ -60,26 +60,51 @@
       "entities": []
     },
     {
-      "text": "select customer 4b43b8b0-2cab-45f7-91c3-9e9a3a8a6f0a",
+      "text": "select customer 9fc358e8-bc0a-4302-9eb4-1f143c6b01d3",
       "intent": "SelectCustomer",
       "entities": [
         {
-          "entity": "customer",
+          "entity": "identifier",
           "startPos": 2,
           "endPos": 10
         }
       ]
     },
     {
-      "text": "select subscription 5dfb26b6-4fee-4186-b44d-f2b374d90dca",
+      "text": "select subscription c58532aa-fb13-4087-ae12-f296eda16c92",
       "intent": "SelectSubscription",
       "entities": [
         {
-          "entity": "subscription",
+          "entity": "identifier",
           "startPos": 2,
           "endPos": 10
         }
       ]
+    },
+    {
+      "text": "where",
+      "intent": "Question",
+      "entities": []
+    },
+    {
+      "text": "why",
+      "intent": "Question",
+      "entities": []
+    },
+    {
+      "text": "how",
+      "intent": "Question",
+      "entities": []
+    },
+    {
+      "text": "what",
+      "intent": "Question",
+      "entities": []
+    },
+    {
+      "text": "can i",
+      "intent": "Question",
+      "entities": []
     }
   ]
 }

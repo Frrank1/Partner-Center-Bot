@@ -79,7 +79,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// <summary>
         /// Gets the Partner Center service reference.
         /// </summary>
-        public IAggregatePartner PartnerCenter => this.GetPartnerCenterClient().Invoke();
+        public IAggregatePartner PartnerCenter => PartnerService.Instance.CreatePartnerOperations(
+            this.TokenManagement.GetPartnerCenterAppOnlyCredentials(
+                $"{this.Configuration.ActiveDirectoryEndpoint}/{this.Configuration.PartnerCenterApplicationTenantId}"));
 
         /// <summary>
         /// Gets the telemetry service reference.
@@ -127,19 +129,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
 
             intent.Initialize();
             await localization.InitializeAsync();
-        }
-
-        /// <summary>
-        /// Obtains a reference to <see cref="IAggregatePartner"/>.
-        /// </summary>
-        /// <returns>A delegate used to obtain an instance of <see cref="IAggregatePartner"/>.</returns>
-        private Func<IAggregatePartner> GetPartnerCenterClient()
-        {
-            ITokenManagement tokenMgmt = new TokenManagement(this);
-
-            return () => PartnerService.Instance.CreatePartnerOperations(
-               tokenMgmt.GetPartnerCenterAppOnlyCredentials(
-               $"{this.Configuration.ActiveDirectoryEndpoint}/{this.Configuration.PartnerCenterApplicationTenantId}"));
         }
     }
 }

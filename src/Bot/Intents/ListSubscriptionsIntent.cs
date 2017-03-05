@@ -45,19 +45,20 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// Performs the operation represented by this intent.
         /// </summary>
         /// <param name="context">The context of the conversational process.</param>
-        /// <param name="result">The message in the conversation.</param>
-        /// <param name="service">Provides access to core services.</param>
-        /// <returns>
-        /// An instance of <see cref="Task" /> that represents the asynchronous operation.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">
+        /// <param name="message">The message from the authenticated user.</param>
+        /// <param name="result">The result from Language Understanding cognitive service.</param>
+        /// <param name="service">Provides access to core services;.</param>
+        /// <returns>An instance of <see cref="Task"/> that represents the asynchronous operation.</returns>
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="context"/> is null.
+        /// or
+        /// <paramref name="message"/> is null.
         /// or
         /// <paramref name="result"/> is null.
         /// or 
         /// <paramref name="service"/> is null.
         /// </exception>
-        public async Task ExecuteAsync(IDialogContext context, LuisResult result, IBotService service)
+        public async Task ExecuteAsync(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result, IBotService service)
         {
             Customer customer = null;
             CustomerPrincipal principal;
@@ -65,12 +66,13 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
             Dictionary<string, double> eventMeasurements;
             Dictionary<string, string> eventProperties;
             Guid correlationId;
-            IMessageActivity message;
+            IMessageActivity response;
             IPartner operations;
             ResourceCollection<Subscription> subscriptions;
             string name;
 
             context.AssertNotNull(nameof(context));
+            message.AssertNotNull(nameof(message));
             result.AssertNotNull(nameof(result));
             service.AssertNotNull(nameof(principal));
 
@@ -78,7 +80,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
             {
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
-                message = context.MakeMessage();
+                response = context.MakeMessage();
                 operations = service.PartnerCenter.With(RequestContextFactory.Instance.Create(correlationId));
                 principal = await context.GetCustomerPrincipalAsync(service);
 
@@ -93,12 +95,12 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                 }
 
                 name = (customer == null) ? "the partner" : customer.CompanyProfile.CompanyName;
-                message.Text = $"Here are the subscriptions for {name}";
-                await context.PostAsync(message);
+                response.Text = $"Here are the subscriptions for {name}";
+                await context.PostAsync(response);
 
-                message = context.MakeMessage();
+                response = context.MakeMessage();
 
-                message.Attachments = subscriptions.Items.Select(s => new HeroCard(
+                response.Attachments = subscriptions.Items.Select(s => new HeroCard(
                     null,
                     null,
                     null,
@@ -113,7 +115,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                         }
                     }).ToAttachment()).ToList();
 
-                await context.PostAsync(message);
+                await context.PostAsync(response);
 
                 // Capture the request for the customer summary for analysis.
                 eventProperties = new Dictionary<string, string>
@@ -129,7 +131,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                 eventMeasurements = new Dictionary<string, double>
                 {
                     { "ElapsedMilliseconds", DateTime.Now.Subtract(startTime).TotalMilliseconds },
-                    { "NumberOfSubscriptions", message.Attachments.Count }
+                    { "NumberOfSubscriptions", response.Attachments.Count }
                 };
 
                 service.Telemetry.TrackEvent("ListCustomers/Execute", eventProperties, eventMeasurements);
@@ -139,9 +141,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                 customer = null;
                 eventMeasurements = null;
                 eventProperties = null;
-                message = null;
                 operations = null;
                 principal = null;
+                response = null;
                 subscriptions = null;
             }
         }

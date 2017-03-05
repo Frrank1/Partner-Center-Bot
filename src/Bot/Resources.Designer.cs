@@ -79,6 +79,15 @@ namespace Microsoft.Store.PartnerCenter.Bot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to help.
+        /// </summary>
+        internal static string Help {
+            get {
+                return ResourceManager.GetString("Help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You can interact with me in the following ways:.
         /// </summary>
         internal static string HelpMessage {
@@ -151,7 +160,7 @@ namespace Microsoft.Store.PartnerCenter.Bot {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You must first login before interacting with me. Please type ** login ** to authenticate. If you still help type ** help ** after successfully authenticating..
+        ///   Looks up a localized string similar to You must first login before interacting with me. Please type ** login ** to authenticate. If you still need help type ** help ** after successfully authenticating..
         /// </summary>
         internal static string NotAuthenticatedHelpMessage {
             get {
@@ -165,6 +174,15 @@ namespace Microsoft.Store.PartnerCenter.Bot {
         internal static string RedisCacheConnectionException {
             get {
                 return ResourceManager.GetString("RedisCacheConnectionException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please reword your question and try again..
+        /// </summary>
+        internal static string RewordQuestion {
+            get {
+                return ResourceManager.GetString("RewordQuestion", resourceCulture);
             }
         }
         

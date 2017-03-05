@@ -68,7 +68,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         /// </summary>
         /// <param name="context">The context for the execution of a dialogs conversational process.</param>
         /// <param name="argument">The message in a conversation between the bot and a user.</param>
-        /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
+        /// <returns>An instance of <see cref="Task"/> that represents the asynchronous operation.</returns>
         public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             CustomerPrincipal principal;
