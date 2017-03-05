@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot", "src\Bot\Bot.csproj",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{BAD9B155-1FCF-4735-A8EC-D8ECCDAB9136}"
 	ProjectSection(SolutionItems) = preProject
-		KeyVault.md = KeyVault.md
+		docs\KeyVault.md = docs\KeyVault.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{B55A743C-BA04-491F-9C64-E7339C30684F}"
