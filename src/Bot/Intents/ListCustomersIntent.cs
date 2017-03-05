@@ -45,17 +45,20 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         /// Performs the operation represented by this intent.
         /// </summary>
         /// <param name="context">The context of the conversational process.</param>
-        /// <param name="result">The message in the conversation.</param>
+        /// <param name="message">The message from the authenticated user.</param>
+        /// <param name="result">The result from Language Understanding cognitive service.</param>
         /// <param name="service">Provides access to core services.</param>
         /// <returns>An instance of <see cref="Task"/> that represents the asynchronous operation.</returns>
-        /// <exception cref="ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="context"/> is null.
+        /// or
+        /// <paramref name="message"/> is null.
         /// or
         /// <paramref name="result"/> is null.
         /// or 
         /// <paramref name="service"/> is null.
         /// </exception>
-        public async Task ExecuteAsync(IDialogContext context, LuisResult result, IBotService service)
+        public async Task ExecuteAsync(IDialogContext context, IAwaitable<IMessageActivity> message, LuisResult result, IBotService service)
         {
             CustomerPrincipal principal;
             DateTime startTime;
@@ -67,6 +70,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
             SeekBasedResourceCollection<Customer> customers;
 
             context.AssertNotNull(nameof(context));
+            message.AssertNotNull(nameof(message));
             result.AssertNotNull(nameof(result));
             service.AssertNotNull(nameof(service));
 
@@ -75,8 +79,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                 startTime = DateTime.Now;
                 correlationId = Guid.NewGuid();
 
-                operations = service.PartnerCenter.With(
-                    RequestContextFactory.Instance.Create(correlationId));
+                operations = service.PartnerCenter.With(RequestContextFactory.Instance.Create(correlationId));
 
                 customers = await operations.Customers.GetAsync();
 

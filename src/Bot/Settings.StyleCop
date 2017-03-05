@@ -4,7 +4,7 @@
       <Value>cloneable</Value>
       <Value>Redis</Value>
     </CollectionProperty>
-    <BooleanProperty Name="AutoCheckForUpdate">False</BooleanProperty> 
+    <BooleanProperty Name="AutoCheckForUpdate">False</BooleanProperty>
   </GlobalSettings>
   <Parsers>
     <Parser ParserId="StyleCop.CSharp.CsParser">

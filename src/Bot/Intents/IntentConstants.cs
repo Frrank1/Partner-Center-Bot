@@ -27,6 +27,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
         public const string ListSubscriptions = "ListSubscriptions";
 
         /// <summary>
+        /// Intent name for the question and answer intent.
+        /// </summary>
+        public const string Question = "Question";
+
+        /// <summary>
         /// Intent name for the select customer intent.
         /// </summary>
         public const string SelectCustomer = "SelectCustomer";

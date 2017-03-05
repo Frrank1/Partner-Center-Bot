@@ -106,6 +106,16 @@ namespace Microsoft.Store.PartnerCenter.Bot.Configuration
         public string PartnerCenterApplicationTenantId => ConfigurationManager.AppSettings["PartnerCenterApplicationTenantId"];
 
         /// <summary>
+        /// Gets the question and answer knowledgebase identifier.
+        /// </summary>
+        public string QnAKnowledgebaseId => ConfigurationManager.AppSettings["QnAKnowledgebaseId"];
+
+        /// <summary>
+        /// Gets question and answer subscription subscription key.
+        /// </summary>
+        public string QnASubscriptionKey => this.GetConfigurationValue("QnASubscriptionKey");
+
+        /// <summary>
         /// Gets the Redis Cache connection string.
         /// </summary>
         public string RedisCacheConnectionString => this.GetConfigurationValue("RedisCacheConnectionString");
@@ -135,7 +145,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Configuration
         /// </summary>
         /// <param name="identifier">Identifier of the resource being requested.</param>
         /// <returns>A string represented the value of the configuration.</returns>
-        /// <exception cref="System.ArgumentException">
+        /// <exception cref="ArgumentException">
         /// <paramref name="identifier"/> is empty or null.
         /// </exception>
         private string GetConfigurationValue(string identifier)
