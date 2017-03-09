@@ -10,7 +10,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
     using System.ComponentModel;
     using System.Linq;
     using System.Threading.Tasks;
-    using Configuration;
     using IdentityModel.Clients.ActiveDirectory;
     using Microsoft.Bot.Builder.Dialogs;
     using Security;
@@ -26,6 +25,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         /// <param name="context">The context for the bot.</param>
         /// <param name="service">Provides access to core application services.</param>
         /// <returns>An instance of <see cref="CustomerPrincipal"/> that represents the authenticated user.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="context"/> is null.
+        /// or
+        /// <paramref name="service"/> is null.
+        /// </exception>
         public static async Task<CustomerPrincipal> GetCustomerPrincipalAsync(this IBotContext context, IBotService service)
         {
             CustomerPrincipal principal = null;
@@ -36,7 +40,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
 
             try
             {
-                if (!context.PrivateConversationData.TryGetValue(BotConstants.CustomerPrincipalKey, out principal))
+                if (context.PrivateConversationData.TryGetValue(BotConstants.CustomerPrincipalKey, out principal))
                 {
                     return principal;
                 }

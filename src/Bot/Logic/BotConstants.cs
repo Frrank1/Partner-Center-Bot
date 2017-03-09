@@ -42,7 +42,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Logic
         public const string ConversationIdKey = "conversationId";
 
         /// <summary>
-        /// Key utilized to manage the <see cref="Authentication.CustomerPrincipal"/> object stored in the user data.
+        /// Key utilized to manage the <see cref="Security.CustomerPrincipal"/> object stored in the user data.
         /// </summary>
         public const string CustomerPrincipalKey = "CustomerPrincipal";
 
