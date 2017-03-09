@@ -19,6 +19,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
     using Exceptions;
     using IdentityModel.Clients.ActiveDirectory;
     using Logic;
+    using Microsoft.Bot.Builder.ConnectorEx;
     using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Builder.Dialogs.Internals;
     using Microsoft.Bot.Connector;
@@ -59,13 +60,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
         public async Task<HttpResponseMessage> OAuthCallbackAsync([FromUri]string code, [FromUri]string state, CancellationToken cancellationToken)
         {
             Activity message;
+            Address address;
+            ConversationReference conversationReference;
             CustomerPrincipal principal = null;
             DateTime startTime;
             Dictionary<string, double> eventMeasurements;
             Dictionary<string, string> eventProperties;
             Dictionary<string, string> stateData;
             IBotData botData;
-            ResumptionCookie resumption;
 
             code.AssertNotEmpty(nameof(code));
             state.AssertNotEmpty(nameof(state));
@@ -75,18 +77,16 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                 startTime = DateTime.Now;
                 stateData = UrlToken.Decode<Dictionary<string, string>>(state);
 
-                resumption = new ResumptionCookie(
-                    new Address(
-                        stateData[BotConstants.BotIdKey],
-                        stateData[BotConstants.ChannelIdKey],
-                        stateData[BotConstants.UserIdKey],
-                        stateData[BotConstants.ConversationIdKey],
-                        stateData[BotConstants.ServiceUrlKey]),
-                    null,
-                    false,
-                    stateData[BotConstants.LocaleKey]);
+                address = new Address(
+                    stateData[BotConstants.BotIdKey],
+                    stateData[BotConstants.ChannelIdKey],
+                    stateData[BotConstants.UserIdKey], 
+                    stateData[BotConstants.ConversationIdKey],
+                    stateData[BotConstants.ServiceUrlKey]);
 
-                message = resumption.GetMessage();
+                conversationReference = address.ToConversationReference();
+
+                message = conversationReference.GetPostToBotMessage();
 
                 using (ILifetimeScope scope = DialogModule.BeginLifetimeScope(Conversation.Container, message))
                 {
@@ -105,7 +105,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                     if (principal == null)
                     {
                         message.Text = Resources.NoRelationshipException;
-                        await Conversation.ResumeAsync(resumption, message, cancellationToken);
+                        await Conversation.ResumeAsync(conversationReference, message, cancellationToken);
 
                         return Request.CreateErrorResponse(
                             HttpStatusCode.BadRequest,
@@ -115,7 +115,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
                     botData.PrivateConversationData.SetValue(BotConstants.CustomerPrincipalKey, principal);
 
                     await botData.FlushAsync(cancellationToken);
-                    await Conversation.ResumeAsync(resumption, message, cancellationToken);
+                    await Conversation.ResumeAsync(conversationReference, message, cancellationToken);
 
                     // Capture the request for the customer summary for analysis.
                     eventProperties = new Dictionary<string, string>
@@ -140,12 +140,13 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
             }
             finally
             {
+                address = null;
                 botData = null;
+                conversationReference = null;
                 eventMeasurements = null;
                 eventProperties = null;
                 message = null;
                 principal = null;
-                resumption = null;
             }
         }
 
@@ -164,7 +165,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Controllers
             List<RoleModel> roles;
             Uri redirectUri;
 
-            code.AssertNotNull(nameof(code));
+            code.AssertNotEmpty(nameof(code));
 
             try
             {

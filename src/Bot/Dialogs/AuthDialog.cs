@@ -11,8 +11,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
     using System.Threading.Tasks;
     using System.Web;
     using Logic;
+    using Microsoft.Bot.Builder.ConnectorEx;
     using Microsoft.Bot.Builder.Dialogs;
-    using Microsoft.Bot.Builder.Dialogs.Internals;
     using Microsoft.Bot.Connector;
     using Security;
 
@@ -30,7 +30,8 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         /// <summary>
         /// The object that relates to a particular point in the conversation.
         /// </summary>
-        private readonly ResumptionCookie resumptionCookie;
+        [NonSerialized]
+        private readonly ConversationReference conversationReference;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthDialog"/> class.
@@ -48,18 +49,20 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
             message.AssertNotNull(nameof(message));
 
             this.service = service;
-            this.resumptionCookie = new ResumptionCookie(message);
-
-            // this.cookie = message.CreateConversationReference();
+            this.conversationReference = message.ToConversationReference();
         }
 
         /// <summary>
         /// The start of the code that represents the conversational dialog.
         /// </summary>
-        /// <param name="context">The dialog context</param>
-        /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
+        /// <param name="context"> The context for the execution of a dialog's conversational process.</param>
+        /// <returns>An instance of <see cref="Task"/> that represents the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="context"/> is null. 
+        /// </exception>
         public async Task StartAsync(IDialogContext context)
         {
+            context.AssertNotNull(nameof(context));
             await this.AuthenticateAsync(context);
         }
 
@@ -72,11 +75,11 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         public async Task MessageReceivedAsync(IDialogContext context, IAwaitable<IMessageActivity> argument)
         {
             CustomerPrincipal principal;
-            IMessageActivity message;
+            IMessageActivity message; 
 
             try
             {
-                message = await argument;
+                message = await argument; 
 
                 if (context.PrivateConversationData.TryGetValue(BotConstants.CustomerPrincipalKey, out principal))
                 {
@@ -84,21 +87,23 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
                 }
                 else
                 {
-                    context.Wait(this.MessageReceivedAsync);
+                    context.Wait(MessageReceivedAsync);
                 }
             }
             finally
             {
-                message = null;
                 principal = null;
             }
         }
 
         /// <summary>
-        /// Processes the authentication request from the end user.
+        /// Prompt the user to authenticate using a sign in card.
         /// </summary>
-        /// <param name="context">The dialog context</param>
+        /// <param name="context">The context for the execution of a dialog's conversational process.</param>
         /// <returns>An instance of <see cref="Task"/> that represents the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="context"/> is null. 
+        /// </exception>
         private async Task AuthenticateAsync(IDialogContext context)
         {
             IMessageActivity message;
@@ -110,7 +115,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
             {
                 redirectUri = new Uri($"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Host}:{HttpContext.Current.Request.Url.Port}/{BotConstants.CallbackPath}");
 
-                state = $"&state={this.GenerateState(context, this.resumptionCookie)}";
+                state = $"&state={this.GenerateState(context)}";
 
                 authUrl = await this.service.TokenManagement.GetAuthorizationRequestUrlAsync(
                     $"{this.service.Configuration.ActiveDirectoryEndpoint}/{BotConstants.AuthorityEndpoint}",
@@ -136,26 +141,27 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         /// Generates the state to be utilized with the authentication request.
         /// </summary>
         /// <param name="context">Context for the dialog.</param>
-        /// <param name="cookie">Used to resume the conversation with the user.</param>
         /// <returns>A string that represents the current state for the user.</returns>
-        private string GenerateState(IBotData context, ResumptionCookie cookie)
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="context"/> is null.
+        /// </exception>
+        private string GenerateState(IDialogContext context)
         {
             Dictionary<string, string> state;
             Guid uniqueId = Guid.NewGuid();
 
-            cookie.AssertNotNull(nameof(cookie));
+            context.AssertNotNull(nameof(context));
 
             try
             {
                 state = new Dictionary<string, string>
                 {
-                    { BotConstants.BotIdKey, cookie.Address.BotId },
-                    { BotConstants.ChannelIdKey, cookie.Address.ChannelId },
-                    { BotConstants.ConversationIdKey, cookie.Address.ConversationId },
+                    { BotConstants.BotIdKey, this.conversationReference.Bot.Id },
+                    { BotConstants.ChannelIdKey, this.conversationReference.ChannelId },
+                    { BotConstants.ConversationIdKey, this.conversationReference.Conversation.Id },
                     { BotConstants.UniqueIdentifierKey, uniqueId.ToString() },
-                    { BotConstants.LocaleKey, cookie.Locale },
-                    { BotConstants.ServiceUrlKey, cookie.Address.ServiceUrl },
-                    { BotConstants.UserIdKey, cookie.Address.UserId }
+                    { BotConstants.ServiceUrlKey, this.conversationReference.ServiceUrl },
+                    { BotConstants.UserIdKey, this.conversationReference.User.Id }
                 };
 
                 // Save the unique identifier in the user's private conversation store. This value will be 

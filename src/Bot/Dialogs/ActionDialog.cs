@@ -180,8 +180,15 @@ namespace Microsoft.Store.PartnerCenter.Bot.Dialogs
         /// <param name="context">The context of the conversational process.</param>
         /// <param name="result">The result returned from </param>
         /// <returns>An instance of <see cref="Task"/> that represents the asynchronous operation.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="context"/> is null.
+        /// or
+        /// <paramref name="result"/> is null.</exception>
         private async Task ResumeAfterAuth(IDialogContext context, IAwaitable<string> result)
         {
+            context.AssertNotNull(nameof(context));
+            result.AssertNotNull(nameof(result));
+
             string message = await result;
             await context.PostAsync(message);
             context.Wait(this.MessageReceived);

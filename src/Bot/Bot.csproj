@@ -78,17 +78,17 @@
     <Reference Include="Microsoft.Azure.KeyVault.WebKey, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Azure.KeyVault.WebKey.2.0.4\lib\net45\Microsoft.Azure.KeyVault.WebKey.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bot.Builder, Version=3.5.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Bot.Builder.3.5.3\lib\net46\Microsoft.Bot.Builder.dll</HintPath>
+    <Reference Include="Microsoft.Bot.Builder, Version=3.5.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Bot.Builder.3.5.5\lib\net46\Microsoft.Bot.Builder.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bot.Builder.Autofac, Version=3.5.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Bot.Builder.3.5.3\lib\net46\Microsoft.Bot.Builder.Autofac.dll</HintPath>
+    <Reference Include="Microsoft.Bot.Builder.Autofac, Version=3.5.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Bot.Builder.3.5.5\lib\net46\Microsoft.Bot.Builder.Autofac.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Bot.Builder.CognitiveServices.QnAMaker, Version=1.0.6215.35517, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Bot.Builder.CognitiveServices.1.0.2\lib\net46\Microsoft.Bot.Builder.CognitiveServices.QnAMaker.dll</HintPath>
+    <Reference Include="Microsoft.Bot.Builder.CognitiveServices.QnAMaker, Version=1.0.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Bot.Builder.CognitiveServices.1.0.3\lib\net46\Microsoft.Bot.Builder.CognitiveServices.QnAMaker.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Bot.Connector, Version=3.5.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Microsoft.Bot.Builder.3.5.3\lib\net46\Microsoft.Bot.Connector.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.Bot.Builder.3.5.5\lib\net46\Microsoft.Bot.Connector.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Graph, Version=1.2.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -238,6 +238,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <Content Include="packages.config" />
+    <None Include="Properties\PublishProfiles\partnercenterbot - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

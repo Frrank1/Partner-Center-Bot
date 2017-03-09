@@ -20,7 +20,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// </summary>
         /// <param name="authority">Address of the authority to issue the token.</param>
         /// <param name="resource">Identifier of the client requesting the token.</param>
-        /// <param name="userId">Identifier of the user that is requesting the token.</param>
+        /// <param name="objectUserId">Identifier of the user that is requesting the token.</param>
         /// <returns>An instance of <see cref="AuthenticationToken"/> that represents the access token.</returns>
         /// <exception cref="ArgumentException">
         /// <paramref name="authority"/> is empty or null.
@@ -28,16 +28,16 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// <paramref name="resource"/> is empty or null.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="userId"/> is null.
+        /// <paramref name="objectUserId"/> is null.
         /// </exception>
-        AuthenticationResult AcquireTokenSilent(string authority, string resource, UserIdentifier userId);
+        AuthenticationResult AcquireTokenSilent(string authority, string resource, UserIdentifier objectUserId);
 
         /// <summary>
         /// Acquires an access token without asking for user credential.
         /// </summary>
         /// <param name="authority">Address of the authority to issue the token.</param>
         /// <param name="resource">Identifier of the client requesting the token.</param>
-        /// <param name="userId">Identifier of the user that is requesting the token.</param>
+        /// <param name="objectUserId">Identifier of the user that is requesting the token.</param>
         /// <returns>An instance of <see cref="AuthenticationToken"/> that represents the access token.</returns>
         /// <exception cref="ArgumentException">
         /// <paramref name="authority"/> is empty or null.
@@ -45,9 +45,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// <paramref name="resource"/> is empty or null.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="userId"/> is null.
+        /// <paramref name="objectUserId"/> is null.
         /// </exception>
-        Task<AuthenticationResult> AcquireTokenSilentAsync(string authority, string resource, UserIdentifier userId);
+        Task<AuthenticationResult> AcquireTokenSilentAsync(string authority, string resource, UserIdentifier objectUserId);
 
         /// <summary>
         /// Gets an access token from the authority using app only authentication.
@@ -102,38 +102,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// <paramref name="resource"/> is empty or null.
         /// </exception>
         Task<string> GetAppOnlyTokenAsync(string authority, string resource, string scope);
-
-        /// <summary>
-        /// Gets an access token from the authority using app + user authentication.
-        /// </summary>
-        /// <param name="authority">Address of the authority to issue the token.</param>
-        /// <param name="resource">Identifier of the target resource that is the recipient of the requested token.</param>
-        /// <param name="token">Access token for the user requesting the resource.</param>
-        /// <returns>An instance of <see cref="AuthenticationToken"/> that represented the access token.</returns>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="authority"/> is empty or null.
-        /// or
-        /// <paramref name="resource"/> is empty or null.
-        /// or 
-        /// <paramref name="token"/> is empty or null.
-        /// </exception>
-        AuthenticationToken GetAppPlusUserToken(string authority, string resource, string token);
-
-        /// <summary>
-        /// Gets an access token from the authority using app + user authentication.
-        /// </summary>
-        /// <param name="authority">Address of the authority to issue the token.</param>
-        /// <param name="resource">Identifier of the target resource that is the recipient of the requested token.</param>
-        /// <param name="token">Access token for the user requesting the resource.</param>
-        /// <returns>An instance of <see cref="AuthenticationToken"/> that represented the access token.</returns>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="authority"/> is empty or null.
-        /// or
-        /// <paramref name="resource"/> is empty or null.
-        /// or
-        /// <paramref name="token"/> is empty or null.
-        /// </exception>
-        Task<AuthenticationToken> GetAppPlusUserTokenAsync(string authority, string resource, string token);
 
         /// <summary>
         /// Gets the URL of the authorization endpoint including the query parameters.
@@ -233,7 +201,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// <paramref name="authority"/> is empty or null.
         /// or
         /// <paramref name="code"/> is empty or null.
-        /// or
+        /// or 
         /// <paramref name="resource"/> is empty or null.
         /// </exception>
         /// <exception cref="ArgumentNullException">

@@ -22,11 +22,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
     public class TokenManagement : ITokenManagement
     {
         /// <summary>
-        /// Type of the assertion representing the user when performing app + user authentication.
-        /// </summary>
-        private const string AssertionType = "urn:ietf:params:oauth:grant-type:jwt-bearer";
-
-        /// <summary>
         /// Provides access to core services.
         /// </summary>
         private readonly IBotService service;
@@ -49,7 +44,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// </summary>
         /// <param name="authority">Address of the authority to issue the token.</param>
         /// <param name="resource">Identifier of the client requesting the token.</param>
-        /// <param name="userId">Identifier of the user that is requesting the token.</param>
+        /// <param name="objectUserId">Identifier of the user that is requesting the token.</param>
         /// <returns>An instance of <see cref="AuthenticationToken"/> that represents the access token.</returns>
         /// <exception cref="ArgumentException">
         /// <paramref name="authority"/> is empty or null.
@@ -57,15 +52,15 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// <paramref name="resource"/> is empty or null.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="userId"/> is null.
+        /// <paramref name="objectUserId"/> is null.
         /// </exception>
-        public AuthenticationResult AcquireTokenSilent(string authority, string resource, UserIdentifier userId)
+        public AuthenticationResult AcquireTokenSilent(string authority, string resource, UserIdentifier objectUserId)
         {
-            authority.AssertNotNull(nameof(authority));
-            resource.AssertNotNull(nameof(resource));
-            userId.AssertNotNull(nameof(userId));
+            authority.AssertNotEmpty(nameof(authority));
+            resource.AssertNotEmpty(nameof(resource));
+            objectUserId.AssertNotNull(nameof(objectUserId));
 
-            return SynchronousExecute(() => this.AcquireTokenSilentAsync(authority, resource, userId));
+            return SynchronousExecute(() => this.AcquireTokenSilentAsync(authority, resource, objectUserId));
         }
 
         /// <summary>
@@ -73,7 +68,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// </summary>
         /// <param name="authority">Address of the authority to issue the token.</param>
         /// <param name="resource">Identifier of the client requesting the token.</param>
-        /// <param name="userId">Identifier of the user that is requesting the token.</param>
+        /// <param name="objectUserId">Identifier of the user that is requesting the token.</param>
         /// <returns>An instance of <see cref="AuthenticationToken"/> that represents the access token.</returns>
         /// <exception cref="ArgumentException">
         /// <paramref name="authority"/> is empty or null.
@@ -81,44 +76,32 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// <paramref name="resource"/> is empty or null.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// <paramref name="userId"/> is null.
+        /// <paramref name="objectUserId"/> is null.
         /// </exception>
-        public async Task<AuthenticationResult> AcquireTokenSilentAsync(string authority, string resource, UserIdentifier userId)
+        public async Task<AuthenticationResult> AcquireTokenSilentAsync(string authority, string resource, UserIdentifier objectUserId)
         {
             AuthenticationContext authContext;
             AuthenticationResult authResult;
-            DistributedTokenCache tokenCache;
 
-            authority.AssertNotNull(nameof(authority));
-            resource.AssertNotNull(nameof(resource));
-            userId.AssertNotNull(nameof(userId));
+            authority.AssertNotEmpty(nameof(authority));
+            resource.AssertNotEmpty(nameof(resource));
+            objectUserId.AssertNotNull(nameof(objectUserId));
 
             try
             {
-                // If the Redis Cache connection string is not populated then utilize the constructor
-                // that only requires the authority. That constructor will utilize a in-memory caching
-                // feature that is built-in into ADAL.
-                if (this.service.Cache.IsEnabled)
-                {
-                    tokenCache = new DistributedTokenCache(this.service, resource);
-                    authContext = new AuthenticationContext(authority, tokenCache);
-                }
-                else
-                {
-                    authContext = new AuthenticationContext(authority);
-                }
+
+                authContext = new AuthenticationContext(authority);
 
                 authResult = await authContext.AcquireTokenSilentAsync(
                     resource,
                     this.service.Configuration.ApplicationId,
-                    userId);
+                    objectUserId);
 
                 return authResult;
             }
             finally
             {
                 authContext = null;
-                tokenCache = null;
             }
         }
 
@@ -163,12 +146,9 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
 
             try
             {
-                // If the Redis Cache connection string is not populated then utilize the constructor
-                // that only requires the authority. That constructor will utilize a in-memory caching
-                // feature that is built-in into ADAL.
                 if (this.service.Cache.IsEnabled)
                 {
-                    tokenCache = new DistributedTokenCache(this.service, resource);
+                    tokenCache = new DistributedTokenCache(this.service, resource, $"AppOnly::{resource}");
                     authContext = new AuthenticationContext(authority, tokenCache);
                 }
                 else
@@ -256,81 +236,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         }
 
         /// <summary>
-        /// Gets an access token from the authority using app + user authentication.
-        /// </summary>
-        /// <param name="authority">Address of the authority to issue the token.</param>
-        /// <param name="resource">Identifier of the target resource that is the recipient of the requested token.</param>
-        /// <param name="token">Access token for the user requesting the resource.</param>
-        /// <returns>An instance of <see cref="AuthenticationToken"/> that represented the access token.</returns>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="authority"/> is empty or null.
-        /// or
-        /// <paramref name="resource"/> is empty or null.
-        /// or 
-        /// <paramref name="token"/> is empty or null.
-        /// </exception>
-        public AuthenticationToken GetAppPlusUserToken(string authority, string resource, string token)
-        {
-            authority.AssertNotEmpty(nameof(authority));
-            resource.AssertNotEmpty(nameof(resource));
-
-            return SynchronousExecute(() => this.GetAppPlusUserTokenAsync(authority, resource, token));
-        }
-
-        /// <summary>
-        /// Gets an access token from the authority using app + user authentication.
-        /// </summary>
-        /// <param name="authority">Address of the authority to issue the token.</param>
-        /// <param name="resource">Identifier of the target resource that is the recipient of the requested token.</param>
-        /// <param name="token">Access token for the user requesting the resource.</param>
-        /// <returns>An instance of <see cref="AuthenticationToken"/> that represented the access token.</returns>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="authority"/> is empty or null.
-        /// or
-        /// <paramref name="resource"/> is empty or null.
-        /// or 
-        /// <paramref name="token"/> is empty or null.
-        /// </exception>
-        public async Task<AuthenticationToken> GetAppPlusUserTokenAsync(string authority, string resource, string token)
-        {
-            AuthenticationContext authContext;
-            AuthenticationResult authResult;
-            DistributedTokenCache tokenCache;
-
-            authority.AssertNotEmpty(nameof(authority));
-            resource.AssertNotEmpty(nameof(resource));
-            token.AssertNotEmpty(nameof(token));
-
-            try
-            {
-                if (this.service.Cache.IsEnabled)
-                {
-                    tokenCache = new DistributedTokenCache(this.service, resource);
-                    authContext = new AuthenticationContext(authority, tokenCache);
-                }
-                else
-                {
-                    authContext = new AuthenticationContext(authority);
-                }
-
-                authResult = await authContext.AcquireTokenAsync(
-                    resource,
-                    new ClientCredential(
-                        this.service.Configuration.ApplicationId,
-                        this.service.Configuration.ApplicationSecret),
-                    new UserAssertion(token, AssertionType));
-
-                return new AuthenticationToken(authResult.AccessToken, authResult.ExpiresOn);
-            }
-            finally
-            {
-                authContext = null;
-                authResult = null;
-                tokenCache = null;
-            }
-        }
-
-        /// <summary>
         /// Gets the URL of the authorization endpoint including the query parameters.
         /// </summary>
         /// <param name="authority">Address of the authority to issue the token.</param>
@@ -374,7 +279,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         public async Task<string> GetAuthorizationRequestUrlAsync(string authority, Uri redirectUri, string resource, string extraQueryParameters)
         {
             AuthenticationContext authContext;
-            DistributedTokenCache tokenCache;
             Uri authUri;
 
             authority.AssertNotEmpty(nameof(authority));
@@ -383,15 +287,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
 
             try
             {
-                if (this.service.Cache.IsEnabled)
-                {
-                    authContext = new AuthenticationContext(authority);
-                }
-                else
-                {
-                    tokenCache = new DistributedTokenCache(this.service, resource);
-                    authContext = new AuthenticationContext(authority, tokenCache);
-                }
+                authContext = new AuthenticationContext(authority);
 
                 authUri = await authContext.GetAuthorizationRequestUrlAsync(
                     resource,
@@ -405,7 +301,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
             finally
             {
                 authContext = null;
-                tokenCache = null;
             }
         }
 
@@ -473,14 +368,14 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// <param name="redirectUri">Redirect URI used for obtain the authorization code.</param>
         /// <returns>An instance of <see cref="AuthenticationToken"/> that represented the access token.</returns>
         /// <exception cref="ArgumentException">
-        /// authority
+        /// <paramref name="authority"/> is empty or null.
         /// or
-        /// code
+        /// <paramref name="code"/> is empty or null.
         /// or
-        /// resource
+        /// <paramref name="resource"/> is empty or null.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// redirectUri
+        /// <paramref name="redirectUri"/> is null.
         /// </exception>
         public AuthenticationResult GetTokenByAuthorizationCode(string authority, string code, string resource, Uri redirectUri)
         {
@@ -501,19 +396,18 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
         /// <param name="redirectUri">Redirect URI used for obtain the authorization code.</param>
         /// <returns>An instance of <see cref="AuthenticationResult"/> that represented the access token.</returns>
         /// <exception cref="ArgumentException">
-        /// authority
+        /// <paramref name="authority"/> is empty or null.
         /// or
-        /// code
+        /// <paramref name="code"/> is empty or null.
         /// or
-        /// resource
+        /// <paramref name="resource"/> is empty or null.
         /// </exception>
         /// <exception cref="ArgumentNullException">
-        /// redirectUri
+        /// <paramref name="redirectUri"/> is null.
         /// </exception>
         public async Task<AuthenticationResult> GetTokenByAuthorizationCodeAsync(string authority, string code, string resource, Uri redirectUri)
         {
             AuthenticationContext authContext;
-            DistributedTokenCache tokenCache;
 
             authority.AssertNotEmpty(nameof(authority));
             code.AssertNotEmpty(nameof(code));
@@ -522,18 +416,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
 
             try
             {
-                // If the Redis Cache connection string is not populated then utilize the constructor
-                // that only requires the authority. That constructor will utilize a in-memory caching
-                // feature that is built-in into ADAL.
-                if (this.service.Cache.IsEnabled)
-                {
-                    tokenCache = new DistributedTokenCache(this.service, resource);
-                    authContext = new AuthenticationContext(authority, tokenCache);
-                }
-                else
-                {
-                    authContext = new AuthenticationContext(authority);
-                }
+                authContext = new AuthenticationContext(authority);
 
                 return await authContext.AcquireTokenByAuthorizationCodeAsync(
                     code,
@@ -546,7 +429,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Security
             finally
             {
                 authContext = null;
-                tokenCache = null;
             }
         }
 

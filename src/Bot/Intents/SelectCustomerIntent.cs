@@ -120,7 +120,7 @@ namespace Microsoft.Store.PartnerCenter.Bot.Intents
                     { "ElapsedMilliseconds", DateTime.Now.Subtract(startTime).TotalMilliseconds }
                 };
 
-                service.Telemetry.TrackEvent("SelectCustomer/Execute", eventProperties, eventMeasurements);
+                service.Telemetry.TrackEvent("SelectCustomer/ExecuteAsync", eventProperties, eventMeasurements);
             }
             finally
             {

@@ -7,8 +7,6 @@
 namespace Microsoft.Store.PartnerCenter.Bot.Cache
 {
     using System;
-    using System.Linq;
-    using System.Security.Claims;
     using IdentityModel.Clients.ActiveDirectory;
     using Logic;
 
@@ -18,15 +16,6 @@ namespace Microsoft.Store.PartnerCenter.Bot.Cache
     /// <seealso cref="TokenCache" />
     public class DistributedTokenCache : TokenCache
     {
-        /// <summary>
-        /// Claim type for the object identifier claim.
-        /// </summary>
-        private const string ObjectIdClaimType = "http://schemas.microsoft.com/identity/claims/objectidentifier";
-
-        /// <summary>
-        /// Resource that is being accessed.
-        /// </summary>
-        private readonly string resource;
 
         /// <summary>
         /// Provides access to core application services.
@@ -38,27 +27,32 @@ namespace Microsoft.Store.PartnerCenter.Bot.Cache
         /// </summary>
         /// <param name="service">Provides access to core application services.</param>
         /// <param name="resource">The resource being accessed.</param>
+        /// <param name="key">The unique identifier for the cache entry.</param>
         /// <exception cref="ArgumentException">
         /// <paramref name="resource"/> is empty or null.
+        /// or
+        /// <paramref name="key"/> is empty or null.
         /// </exception>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="service"/> is null. 
         /// </exception>
-        public DistributedTokenCache(IBotService service, string resource)
+        public DistributedTokenCache(IBotService service, string resource, string key)
         {
+            service.AssertNotNull(nameof(service));
+            key.AssertNotEmpty(nameof(key));
             resource.AssertNotEmpty(nameof(resource));
 
             this.service = service;
-            this.resource = resource;
+            this.Key = key;
 
             this.AfterAccess = this.AfterAccessNotification;
             this.BeforeAccess = this.BeforeAccessNotification;
         }
 
         /// <summary>
-        /// Gets the key to be utilized for interfacing with the cache.
+        /// Gets the unique identifier for the cache entry.
         /// </summary>
-        private string Key => $"Resource::{this.resource}::Identifier::{ClaimsPrincipal.Current.Identities.First().FindFirst(ObjectIdClaimType).Value}";
+        private string Key { get; }
 
         /// <summary>
         /// Notification method called after any library method accesses the cache.
