@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26206.0
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2C543791-022E-451C-BBB4-D756A459B91A}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,15 +18,26 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{BAD9B155-1FCF-4735-A8EC-D8ECCDAB9136}"
 	ProjectSection(SolutionItems) = preProject
 		docs\AddingIntents.md = docs\AddingIntents.md
+		docs\Deployment.md = docs\Deployment.md
 		docs\KeyVault.md = docs\KeyVault.md
+		docs\Preconsent.md = docs\Preconsent.md
 		docs\QnAMaker.md = docs\QnAMaker.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{B55A743C-BA04-491F-9C64-E7339C30684F}"
 	ProjectSection(SolutionItems) = preProject
 		docs\Images\aad01.png = docs\Images\aad01.png
+		docs\Images\aad02.png = docs\Images\aad02.png
+		docs\Images\aad03.png = docs\Images\aad03.png
 		docs\Images\appmgmt01.png = docs\Images\appmgmt01.png
 		docs\Images\appmgmt02.png = docs\Images\appmgmt02.png
+		docs\Images\bot01.png = docs\Images\bot01.png
+		docs\Images\bot02.png = docs\Images\bot02.png
+		docs\Images\luis01.png = docs\Images\luis01.png
+		docs\Images\luis02.png = docs\Images\luis02.png
+		docs\Images\qnaservice01.png = docs\Images\qnaservice01.png
+		docs\Images\qnaservice02.png = docs\Images\qnaservice02.png
+		docs\Images\qnaservice03.png = docs\Images\qnaservice03.png
 	EndProjectSection
 EndProject
 Global
